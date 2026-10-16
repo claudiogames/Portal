@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central | Grendene</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                document.documentElement.classList.remove('dark');
+                const icon = document.getElementById('theme-icon');
+                if(icon) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+        });
+    </script>
+</head>
+<body class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col justify-between font-sans selection:bg-red-600 selection:text-white transition-colors duration-200">
+
+    <!-- Topo Simples -->
+    <header class="w-full border-b border-zinc-200 dark:border-zinc-900 py-5">
+        <div class="max-w-4xl mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="w-2 h-2 rounded-full bg-red-600"></span>
+                <span class="text-xs font-mono font-medium tracking-widest uppercase">Grendene &bull; Operações</span>
+            </div>
+            
+            <button onclick="toggleDarkMode()" aria-label="Alternar tema" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Conteúdo Central Enxuto -->
+    <main class="max-w-4xl mx-auto px-6 py-16 flex-grow w-full flex flex-col justify-center">
+        <div class="mb-10">
+            <h1 class="text-2xl sm:text-3xl font-light tracking-tight">Painel de Sistemas</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-mono">Selecione o subsistema de turno abaixo.</p>
+        </div>
+
+        <!-- Lista / Grade Minimalista -->
+        <div class="grid grid-cols-1 gap-3">
+            
+            <!-- Item 1: Controle do Carregamento -->
+            <a href="https://controle-carregamento.vercel.app/" target="_blank" rel="noopener noreferrer" 
+               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-mono text-zinc-400">01</span>
+                    <div>
+                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Controle do Carregamento</h2>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Gerenciamento e acompanhamento de cargas</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+            </a>
+
+            <!-- Item 2 -->
+            <a href="https://ocportao1.vercel.app/" target="_blank" rel="noopener noreferrer" 
+               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-mono text-zinc-400">02</span>
+                    <div>
+                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Controle de Ocorrências</h2>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Apontamentos, avarias e desvios de turno</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+            </a>
+
+            <!-- Item 3 -->
+            <a href="https://fxcxgrnd3.netlify.app/" target="_blank" rel="noopener noreferrer" 
+               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-mono text-zinc-400">03</span>
+                    <div>
+                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Caixas sem externas</h2>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Gerenciamento e redimensionamento de etiquetas</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+            </a>
+
+            <!-- Item 4: Rastreio de SSCC -->
+            <a href="https://repogrnd.netlify.app/" target="_blank" rel="noopener noreferrer" 
+               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-mono text-zinc-400">04</span>
+                    <div>
+                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Rastreio de SSCC</h2>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Mapeamento de caixas em reposição e rasgadas sorter</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+            </a>
+
+            <!-- Item 5: Registro de reposição -->
+            <a href="https://repogrnd3.netlify.app/" target="_blank" rel="noopener noreferrer" 
+               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-mono text-zinc-400">05</span>
+                    <div>
+                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Registro de reposição</h2>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Lançamento e controle centralizado de pares e numerações</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Rodapé Minimalista -->
+    <footer class="w-xl max-w-4xl mx-auto px-6 py-6 w-full border-t border-zinc-100 dark:border-zinc-900 text-xs text-zinc-400 font-mono flex justify-between">
+        <span>Grendene S.A.</span>
+        <span>v3.6-PURE</span>
+    </footer>
+
+</body>
+</html>
