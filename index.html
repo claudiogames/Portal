@@ -38,105 +38,198 @@
                     icon.classList.add('fa-moon');
                 }
             }
+
+            // DEIXAR O VÍDEO MAIS LENTO (0.5 = Metade da velocidade normal)
+            const bgVideo = document.getElementById('background-video');
+            if (bgVideo) {
+                bgVideo.playbackRate = 0.5;
+            }
         });
     </script>
-</head>
-<body class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col justify-between font-sans selection:bg-red-600 selection:text-white transition-colors duration-200">
+    <style>
+        /* ESTILOS PARA O VÍDEO DE FUNDO EM LOOP */
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -10;
+            pointer-events: none;
+        }
 
-    <!-- Topo Simples -->
-    <header class="w-full border-b border-zinc-200 dark:border-zinc-900 py-5">
-        <div class="max-w-4xl mx-auto px-6 flex justify-between items-center">
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 8, 15, 0.45);
+            z-index: -9;
+            pointer-events: none;
+        }
+
+        /* ANIMAÇÃO DA CAIXA QUICANDO NO CHÃO (SPLASH SCREEN) */
+        @keyframes caixaQuicando {
+            0% { transform: translateY(-120px) scale(0.9); opacity: 0; }
+            40% { transform: translateY(0px) scale(1, 0.85); opacity: 1; }
+            55% { transform: translateY(-35px) scale(1, 1); }
+            70% { transform: translateY(0px) scale(1, 0.92); }
+            85% { transform: translateY(-12px) scale(1, 1); }
+            100% { transform: translateY(0px) scale(1, 1); opacity: 1; }
+        }
+
+        @keyframes sombraQuique {
+            0% { transform: scale(0.3); opacity: 0; }
+            40% { transform: scale(1.2); opacity: 0.6; }
+            55% { transform: scale(0.7); opacity: 0.2; }
+            70% { transform: scale(1); opacity: 0.4; }
+            85% { transform: scale(0.85); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+
+        .animar-quique {
+            animation: caixaQuicando 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .animar-sombra {
+            animation: sombraQuique 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between font-sans selection:bg-red-600 selection:text-white transition-colors duration-200">
+
+    <!-- ANIMAÇÃO CURTA INICIAL (CAIXA QUICANDO) -->
+    <div id="splash-screen" class="fixed inset-0 bg-[#0d1117] z-[999999] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex flex-col items-center">
+            <!-- Caixa Quicando -->
+            <div class="w-24 h-24 rounded-2xl bg-blue-600/15 border border-blue-500/40 flex items-center justify-center p-3 shadow-2xl animar-quique">
+                <img src="https://pub-f46b0cda8b8d434aabcf14ccac85f3af.r2.dev/1791682069820.png" alt="Caixa Grendene" class="w-full h-full object-contain drop-shadow-[0_8px_10px_rgba(0,0,0,0.6)]">
+            </div>
+            <!-- Sombra no Chão -->
+            <div class="w-16 h-2 bg-blue-500/50 rounded-full blur-[2px] mt-4 animar-sombra"></div>
+
+            <!-- Título Portão 1 CD -->
+            <h1 class="text-white text-base font-extrabold tracking-wider uppercase mt-5 flex items-center gap-2 opacity-0 animate-[fadeIn_0.3s_ease_0.6s_forwards]">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span> Portão 1 CD
+            </h1>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.remove(), 500);
+                }
+            }, 1400);
+        });
+    </script>
+
+    <!-- VÍDEO DE FUNDO EM LOOP -->
+    <video id="background-video" autoplay muted loop playsinline class="video-bg">
+        <source src="https://pub-f46b0cda8b8d434aabcf14ccac85f3af.r2.dev/Fundo%20loop%C3%A1vel%20com%20gradiente%20de%20movimento%20Azul(MP4).mp4" type="video/mp4">
+        Seu navegador não suporta vídeos em HTML5.
+    </video>
+    <div class="video-overlay"></div>
+
+    <!-- Topo Simples com Fundo Translúcido -->
+    <header class="w-full border-b border-white/10 py-5 backdrop-blur-md bg-black/20 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <span class="w-2 h-2 rounded-full bg-red-600"></span>
-                <span class="text-xs font-mono font-medium tracking-widest uppercase">Grendene &bull; Operações</span>
+                <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                <span class="text-xs font-mono font-medium tracking-widest uppercase text-white/90">Grendene &bull; Operações</span>
             </div>
             
-            <button onclick="toggleDarkMode()" aria-label="Alternar tema" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
+            <button onclick="toggleDarkMode()" aria-label="Alternar tema" class="text-white/70 hover:text-white transition-colors cursor-pointer p-2 rounded-lg bg-white/10">
                 <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
             </button>
         </div>
     </header>
 
     <!-- Conteúdo Central Enxuto -->
-    <main class="max-w-4xl mx-auto px-6 py-16 flex-grow w-full flex flex-col justify-center">
-        <div class="mb-10">
-            <h1 class="text-2xl sm:text-3xl font-light tracking-tight">Painel de Sistemas</h1>
-            <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-mono">Selecione o subsistema de turno abaixo.</p>
+    <main class="max-w-5xl mx-auto px-6 py-12 flex-grow w-full flex flex-col justify-center relative z-10">
+        <div class="mb-8">
+            <h1 class="text-2xl sm:text-3xl font-light tracking-tight text-white drop-shadow-md">Painel de Sistemas</h1>
+            <p class="text-xs sm:text-sm text-zinc-300 mt-1 font-mono">Selecione o subsistema de turno abaixo.</p>
         </div>
 
-        <!-- Lista / Grade Minimalista -->
-        <div class="grid grid-cols-1 gap-3">
+        <!-- Botões Flutuantes e Alinhados na Horizontal -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             <!-- Item 1: Controle do Carregamento -->
             <a href="https://controle-carregamento.vercel.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-mono text-zinc-400">01</span>
-                    <div>
-                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Controle do Carregamento</h2>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Gerenciamento e acompanhamento de cargas</p>
-                    </div>
+               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">01</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
                 </div>
-                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+                <div>
+                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Controle do Carregamento</h2>
+                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Gerenciamento e acompanhamento de cargas</p>
+                </div>
             </a>
 
-            <!-- Item 2 -->
+            <!-- Item 2: Controle de Ocorrências -->
             <a href="https://ocportao1.vercel.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-mono text-zinc-400">02</span>
-                    <div>
-                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Controle de Ocorrências</h2>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Apontamentos, avarias e desvios de turno</p>
-                    </div>
+               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">02</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
                 </div>
-                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+                <div>
+                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Controle de Ocorrências</h2>
+                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Apontamentos, avarias e desvios de turno</p>
+                </div>
             </a>
 
-            <!-- Item 3 -->
+            <!-- Item 3: Caixas sem externas -->
             <a href="https://fxcxgrnd3.netlify.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-mono text-zinc-400">03</span>
-                    <div>
-                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Caixas sem externas</h2>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Gerenciamento e redimensionamento de etiquetas</p>
-                    </div>
+               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">03</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
                 </div>
-                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+                <div>
+                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Caixas sem externas</h2>
+                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Gerenciamento e redimensionamento de etiquetas</p>
+                </div>
             </a>
 
             <!-- Item 4: Rastreio de SSCC -->
             <a href="https://repogrnd.netlify.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-mono text-zinc-400">04</span>
-                    <div>
-                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Rastreio de SSCC</h2>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Mapeamento de caixas em reposição e rasgadas sorter</p>
-                    </div>
+               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">04</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
                 </div>
-                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+                <div>
+                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Rastreio de SSCC</h2>
+                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Mapeamento de caixas em reposição e rasgadas sorter</p>
+                </div>
             </a>
 
             <!-- Item 5: Registro de reposição -->
             <a href="https://repogrnd3.netlify.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex items-center justify-between p-5 rounded-xl border border-zinc-200 dark:border-zinc-900 hover:border-red-600 dark:hover:border-red-600 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-200">
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-mono text-zinc-400">05</span>
-                    <div>
-                        <h2 class="text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">Registro de reposição</h2>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Lançamento e controle centralizado de pares e numerações</p>
-                    </div>
+               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300 md:col-span-2">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">05</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
                 </div>
-                <i class="fa-solid fa-arrow-right text-xs text-zinc-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all"></i>
+                <div>
+                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Registro de reposição</h2>
+                    <p class="text-xs text-zinc-300 mt-1">Lançamento e controle centralizado de pares e numerações</p>
+                </div>
             </a>
 
         </div>
     </main>
 
     <!-- Rodapé Minimalista -->
-    <footer class="w-xl max-w-4xl mx-auto px-6 py-6 w-full border-t border-zinc-100 dark:border-zinc-900 text-xs text-zinc-400 font-mono flex justify-between">
+    <footer class="max-w-5xl mx-auto px-6 py-6 w-full border-t border-white/10 text-xs text-zinc-400 font-mono flex justify-between backdrop-blur-md bg-black/20 relative z-10">
         <span>Grendene S.A.</span>
         <span>v3.6-PURE</span>
     </footer>
