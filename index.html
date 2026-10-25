@@ -3,402 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central | Grendene</title>
+    <title>Portão 1 CD • Central Operacional</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script>
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            const icon = document.getElementById('theme-icon');
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.classList.add('dark');
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('theme') === 'light') {
-                document.documentElement.classList.remove('dark');
-                const icon = document.getElementById('theme-icon');
-                if(icon) {
-                    icon.classList.remove('fa-sun');
-                    icon.classList.add('fa-moon');
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#090d16',
+                        cardbg: '#111827',
+                        bordercol: '#1f2937'
+                    }
                 }
             }
-
-            const bgVideo = document.getElementById('background-video');
-            if (bgVideo) {
-                bgVideo.playbackRate = 0.5;
-            }
-
-            iniciarMonitoramentoAtividades();
-        });
+        }
     </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* ESTILOS PARA O VÍDEO DE FUNDO EM LOOP */
-        .video-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            z-index: -10;
-            pointer-events: none;
+        .app-frame {
+            width: 100%;
+            height: calc(100vh - 65px);
+            border: none;
+            display: none;
         }
-
-        .video-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(5, 8, 15, 0.45);
-            z-index: -9;
-            pointer-events: none;
+        .app-frame.active {
+            display: block;
         }
-
-        /* ANIMAÇÃO DA CAIXA QUICANDO NO CHÃO (SPLASH SCREEN) */
-        @keyframes caixaQuicando {
-            0% { transform: translateY(-120px) scale(0.9); opacity: 0; }
-            40% { transform: translateY(0px) scale(1, 0.85); opacity: 1; }
-            55% { transform: translateY(-35px) scale(1, 1); }
-            70% { transform: translateY(0px) scale(1, 0.92); }
-            85% { transform: translateY(-12px) scale(1, 1); }
-            100% { transform: translateY(0px) scale(1, 1); opacity: 1; }
+        ::-webkit-scrollbar {
+            height: 4px;
+            width: 4px;
         }
-
-        @keyframes sombraQuique {
-            0% { transform: scale(0.3); opacity: 0; }
-            40% { transform: scale(1.2); opacity: 0.6; }
-            55% { transform: scale(0.7); opacity: 0.2; }
-            70% { transform: scale(1); opacity: 0.4; }
-            85% { transform: scale(0.85); opacity: 0.3; }
-            100% { transform: scale(1); opacity: 0.5; }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
         }
-
-        .animar-quique {
-            animation: caixaQuicando 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 2px;
         }
-
-        .animar-sombra {
-            animation: sombraQuique 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
-        /* ANIMAÇÃO TICKER HORIZONTAL */
-        @keyframes ticker {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-50%, 0, 0); }
-        }
-
-        .animate-ticker {
-            display: flex;
-            white-space: nowrap;
-            animation: ticker 30s linear infinite;
-        }
-
-        .animate-ticker:hover {
-            animation-play-state: paused;
+        .toast-animate {
+            animation: slideIn 0.3s ease-out forwards;
         }
     </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between font-sans selection:bg-red-600 selection:text-white transition-colors duration-200">
+<body class="bg-darkbg text-slate-100 min-h-screen flex flex-col font-sans select-none overflow-hidden">
 
-    <!-- ANIMAÇÃO CURTA INICIAL (CAIXA QUICANDO) -->
-    <div id="splash-screen" class="fixed inset-0 bg-[#0d1117] z-[999999] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative flex flex-col items-center">
-            <!-- Caixa Quicando -->
-            <div class="w-24 h-24 rounded-2xl bg-blue-600/15 border border-blue-500/40 flex items-center justify-center p-3 shadow-2xl animar-quique">
-                <img src="https://pub-f46b0cda8b8d434aabcf14ccac85f3af.r2.dev/1791682069820.png" alt="Caixa Grendene" class="w-full h-full object-contain drop-shadow-[0_8px_10px_rgba(0,0,0,0.6)]">
-            </div>
-            <!-- Sombra no Chão -->
-            <div class="w-16 h-2 bg-blue-500/50 rounded-full blur-[2px] mt-4 animar-sombra"></div>
-
-            <!-- Título Portão 1 CD -->
-            <h1 class="text-white text-base font-extrabold tracking-wider uppercase mt-5 flex items-center gap-2 opacity-0 animate-[fadeIn_0.3s_ease_0.6s_forwards]">
-                <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span> Portão 1 CD
-            </h1>
+    <!-- CABEÇALHO COM ÍCONE DA GRENDENE -->
+    <header class="bg-cardbg border-b border-bordercol px-4 py-2 flex items-center justify-between shadow-lg shrink-0">
+        
+        <!-- Identidade com Ícone Real -->
+        <div class="flex items-center space-x-2.5">
+            <!-- Ícone da Grendene Redimensionado -->
+            <img src="https://pub-f46b0cda8b8d434aabcf14ccac85f3af.r2.dev/1791682069820.png" alt="Grendene" class="w-6 h-6 object-contain rounded">
+            <span class="text-xs font-bold tracking-wider uppercase text-slate-200">Grendene</span>
+            <span class="text-slate-600">/</span>
+            <span class="text-xs font-semibold text-slate-400">Portão 1 CD</span>
         </div>
-    </div>
-
-    <script>
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                if (splash) {
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.remove(), 500);
-                }
-            }, 1400);
-        });
-    </script>
-
-    <!-- VÍDEO DE FUNDO EM LOOP -->
-    <video id="background-video" autoplay muted loop playsinline class="video-bg">
-        <source src="https://pub-f46b0cda8b8d434aabcf14ccac85f3af.r2.dev/Fundo%20loop%C3%A1vel%20com%20gradiente%20de%20movimento%20Azul(MP4).mp4" type="video/mp4">
-        Seu navegador não suporta vídeos em HTML5.
-    </video>
-    <div class="video-overlay"></div>
-
-    <!-- Topo Simples com Fundo Translúcido -->
-    <header class="w-full border-b border-white/10 py-5 backdrop-blur-md bg-black/20 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-6 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                <span class="text-xs font-mono font-medium tracking-widest uppercase text-white/95">Grendene &bull; Operações</span>
-            </div>
-            
-            <button onclick="toggleDarkMode()" aria-label="Alternar tema" class="text-white/70 hover:text-white transition-colors cursor-pointer p-2 rounded-lg bg-white/10">
-                <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
+        
+        <!-- Navegação em Abas Discretas (Iniciando em Ocorrências) -->
+        <nav class="flex items-center space-x-1 overflow-x-auto max-w-[65vw] sm:max-w-none px-2">
+            <button onclick="switchApp('ocorrencias', this)" id="btn-ocorrencias" class="nav-btn px-3 py-1.5 bg-blue-600 text-slate-100 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 shadow-sm shadow-blue-900/50">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                <span>Ocorrências</span>
             </button>
+            <button onclick="switchApp('carregamento', this)" id="btn-carregamento" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
+                <i data-lucide="truck" class="w-3.5 h-3.5"></i>
+                <span>Carregamento</span>
+            </button>
+            <button onclick="switchApp('sem-externas', this)" id="btn-sem-externas" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
+                <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                <span>Sem Externas</span>
+            </button>
+            <button onclick="switchApp('rastreio', this)" id="btn-rastreio" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
+                <i data-lucide="box" class="w-3.5 h-3.5"></i>
+                <span>Rastreio SSCC</span>
+            </button>
+            <button onclick="switchApp('etiquetas', this)" id="btn-etiquetas" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
+                <i data-lucide="barcode" class="w-3.5 h-3.5"></i>
+                <span>Etiquetas</span>
+            </button>
+            <button onclick="switchApp('requisicao', this)" id="btn-requisicao" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>Requisição</span>
+            </button>
+        </nav>
+
+        <!-- Atalhos discretos -->
+        <div class="hidden lg:flex items-center text-[10px] text-slate-500 font-mono bg-slate-900 px-2 py-1 rounded border border-bordercol">
+            💡 2 cliques: Tela Cheia | 3 cliques: Recarregar
         </div>
+
     </header>
 
-    <!-- Conteúdo Central Enxuto -->
-    <main class="max-w-5xl mx-auto px-6 py-10 flex-grow w-full flex flex-col justify-center relative z-10 space-y-8">
-        
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-light tracking-tight text-white drop-shadow-md">Painel de Sistemas</h1>
-            <p class="text-xs sm:text-sm text-zinc-300 mt-1 font-mono">Selecione o subsistema de turno abaixo.</p>
-        </div>
-
-        <!-- Botões Flutuantes e Alinhados na Horizontal -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            <!-- Item 1: Controle do Carregamento -->
-            <a href="https://controle-carregamento.vercel.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">01</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
-                </div>
-                <div>
-                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Controle do Carregamento</h2>
-                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Gerenciamento e acompanhamento de cargas</p>
-                </div>
-            </a>
-
-            <!-- Item 2: Controle de Ocorrências -->
-            <a href="https://ocportao1.vercel.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">02</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
-                </div>
-                <div>
-                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Controle de Ocorrências</h2>
-                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Apontamentos, avarias e desvios de turno</p>
-                </div>
-            </a>
-
-            <!-- Item 3: Caixas sem externas -->
-            <a href="https://fxcxgrnd3.netlify.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">03</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
-                </div>
-                <div>
-                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Caixas sem externas</h2>
-                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Gerenciamento e redimensionamento de etiquetas</p>
-                </div>
-            </a>
-
-            <!-- Item 4: Rastreio de SSCC -->
-            <a href="https://repogrnd.netlify.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">04</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
-                </div>
-                <div>
-                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Rastreio de SSCC</h2>
-                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Mapeamento de caixas em reposição e rasgadas sorter</p>
-                </div>
-            </a>
-
-            <!-- Item 5: Controle de Etiquetas -->
-            <a href="https://controledeetiquetas.vercel.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">05</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
-                </div>
-                <div>
-                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Controle de Etiquetas</h2>
-                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Lançamento e controle de ETQ Padrão e Exportação</p>
-                </div>
-            </a>
-
-            <!-- Item 6: Sistema de Requisição -->
-            <a href="https://sisgrnd.netlify.app/" target="_blank" rel="noopener noreferrer" 
-               class="group flex flex-col justify-between p-5 rounded-2xl border border-white/15 hover:border-red-600 bg-black/40 backdrop-blur-xl hover:bg-black/60 shadow-lg hover:shadow-red-900/20 transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-xs font-mono text-zinc-400 px-2.5 py-1 rounded-md bg-white/10">06</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400 group-hover:text-red-500 transition-colors"></i>
-                </div>
-                <div>
-                    <h2 class="text-sm font-semibold text-white group-hover:text-red-500 transition-colors">Sistema de Requisição</h2>
-                    <p class="text-xs text-zinc-300 mt-1 line-clamp-2">Gerenciamento de requisições de estoque e insumos</p>
-                </div>
-            </a>
-
-        </div>
-
-        <!-- FEED MINIMALISTA: ÚLTIMOS REGISTROS (TICKER EM LINHA ÚNICA) -->
-        <div class="px-5 py-3 rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-lg flex items-center overflow-hidden">
-            <div class="flex items-center space-x-2 mr-4 shrink-0 border-r border-white/10 pr-4">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span class="text-xs font-semibold text-white uppercase tracking-wider font-mono">Últimos registros</span>
-            </div>
-
-            <!-- Container Animado em Linha -->
-            <div class="relative w-full overflow-hidden flex items-center">
-                <div id="ticker-atividades" class="animate-ticker text-xs font-mono text-zinc-300 space-x-8">
-                    <span class="text-zinc-500">A carregar registros do ecossistema...</span>
-                </div>
-            </div>
-        </div>
-
+    <!-- CONTAINER DE IFRAMES -->
+    <main class="flex-1 w-full relative bg-darkbg" id="mainContainer">
+        <iframe id="frame-ocorrencias" src="https://ocportao1.vercel.app/" class="app-frame active" title="Ocorrências"></iframe>
+        <iframe id="frame-carregamento" src="https://controle-carregamento.vercel.app/" class="app-frame" title="Carregamento"></iframe>
+        <iframe id="frame-sem-externas" src="https://fxcxgrnd3.netlify.app/" class="app-frame" title="Sem Externas"></iframe>
+        <iframe id="frame-rastreio" src="https://repogrnd.netlify.app/" class="app-frame" title="Rastreio SSCC"></iframe>
+        <iframe id="frame-etiquetas" src="https://controledeetiquetas.vercel.app/" class="app-frame" title="Etiquetas"></iframe>
+        <iframe id="frame-requisicao" src="https://sisgrnd.netlify.app/" class="app-frame" title="Requisição"></iframe>
     </main>
 
-    <!-- Rodapé Minimalista -->
-    <footer class="max-w-5xl mx-auto px-6 py-6 w-full border-t border-white/10 text-xs text-zinc-400 font-mono flex justify-between backdrop-blur-md bg-black/20 relative z-10">
-        <span>Grendene S.A.</span>
-        <span>v3.9-MINIMAL</span>
-    </footer>
+    <!-- TOAST NOTIFICATIONS CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
-    <!-- LOGICA DO TICKER REALTIME -->
+    <!-- SCRIPTS -->
     <script>
-        const SUPABASE_ETQ_URL = 'https://mdrhviciouopctcbpotr.supabase.co';
-        const SUPABASE_ETQ_KEY = 'sb_publishable_Zs7XKc999RsKCgqRFBPigQ__aYnbqGq';
-        const clientEtq = supabase.createClient(SUPABASE_ETQ_URL, SUPABASE_ETQ_KEY);
+        lucide.createIcons();
 
-        const SUPABASE_SSCC_URL = 'https://mpsyqawieuwjgupoedib.supabase.co';
-        const SUPABASE_SSCC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wc3lxYXdpZXV3amd1cG9lZDBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTA1OTQsImV4cCI6MjEwNjA4NjU5NH0.P9I8u6ycOBCKYIT2mvp35kZ-SfNTHiVY3Jkw7ltYFuQ';
-        const clientSscc = supabase.createClient(SUPABASE_SSCC_URL, SUPABASE_SSCC_KEY);
+        let currentAppId = 'ocorrencias';
 
-        let listaAtividades = [];
+        function switchApp(appId, btnElement) {
+            currentAppId = appId;
 
-        async function iniciarMonitoramentoAtividades() {
-            await carregarAtividadesIniciais();
-            inscreverCanaisRealtime();
-        }
+            document.querySelectorAll('.app-frame').forEach(frame => {
+                frame.classList.remove('active');
+            });
 
-        async function carregarAtividadesIniciais() {
-            try {
-                const resPadrao = await clientEtq.from('caixas_padrao').select('*').order('created_at', { ascending: false }).limit(4);
-                const resExp = await clientEtq.from('caixas_exportacao').select('*').order('created_at', { ascending: false }).limit(4);
-                const resSscc = await clientSscc.from('registros_sscc').select('*').order('id', { ascending: false }).limit(4);
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol";
+            });
 
-                listaAtividades = [];
+            const targetFrame = document.getElementById(`frame-${appId}`);
+            if (targetFrame) {
+                targetFrame.classList.add('active');
+            }
 
-                (resPadrao.data || []).forEach(item => {
-                    listaAtividades.push({
-                        sistema: 'Etiquetas',
-                        acao: 'ETQ Padrão',
-                        codigo: item.sscc,
-                        hora: item.created_at ? new Date(item.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''
-                    });
-                });
-
-                (resExp.data || []).forEach(item => {
-                    listaAtividades.push({
-                        sistema: 'Etiquetas',
-                        acao: 'ETQ Exportação',
-                        codigo: item.sscc_exportacao,
-                        hora: item.created_at ? new Date(item.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''
-                    });
-                });
-
-                (resSscc.data || []).forEach(item => {
-                    listaAtividades.push({
-                        sistema: 'Rastreio SSCC',
-                        acao: item.categoria || 'Reposição',
-                        codigo: item.sscc,
-                        hora: ''
-                    });
-                });
-
-                renderizarTicker();
-            } catch (err) {
-                console.error("Erro ao carregar ticker:", err);
+            const targetBtn = btnElement || document.getElementById(`btn-${appId}`);
+            if (targetBtn) {
+                targetBtn.className = "nav-btn px-3 py-1.5 bg-blue-600 text-slate-100 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 shadow-sm shadow-blue-900/50";
             }
         }
 
-        function renderizarTicker() {
-            const container = document.getElementById('ticker-atividades');
-            if (listaAtividades.length === 0) {
-                container.innerHTML = `<span class="text-zinc-500">Nenhum registro recente encontrado.</span>`;
-                return;
+        function reloadActiveApp() {
+            const activeFrame = document.getElementById(`frame-${currentAppId}`);
+            if (activeFrame) {
+                activeFrame.src = activeFrame.src;
             }
-
-            // Duplica o array para dar o efeito contínuo perfeito no ticker horizontal
-            const itensDuplicados = [...listaAtividades, ...listaAtividades];
-
-            container.innerHTML = itensDuplicados.map(item => `
-                <div class="inline-flex items-center space-x-2 shrink-0">
-                    <span class="text-zinc-500">[${item.sistema}]</span>
-                    <span class="text-white font-semibold">${item.acao}:</span>
-                    <span class="text-emerald-400 font-mono">${item.codigo}</span>
-                    ${item.hora ? `<span class="text-zinc-500 text-[10px]">(${item.hora})</span>` : ''}
-                    <span class="text-zinc-700 ml-4">&bull;</span>
-                </div>
-            `).join('');
+            mostrarToast("Aba atual recarregada.", "info");
         }
 
-        function inscreverCanaisRealtime() {
-            clientEtq.channel('ticker_etq_p')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'caixas_padrao' }, payload => {
-                    listaAtividades.unshift({
-                        sistema: 'Etiquetas',
-                        acao: 'ETQ Padrão',
-                        codigo: payload.new.sscc,
-                        hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                    });
-                    renderizarTicker();
-                }).subscribe();
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.error(err));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
 
-            clientEtq.channel('ticker_etq_e')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'caixas_exportacao' }, payload => {
-                    listaAtividades.unshift({
-                        sistema: 'Etiquetas',
-                        acao: 'ETQ Exportação',
-                        codigo: payload.new.sscc_exportacao,
-                        hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                    });
-                    renderizarTicker();
-                }).subscribe();
+        let clickCount = 0;
+        let clickTimer = null;
 
-            clientSscc.channel('ticker_sscc')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'registros_sscc' }, payload => {
-                    listaAtividades.unshift({
-                        sistema: 'Rastreio SSCC',
-                        acao: payload.new.categoria || 'Reposição',
-                        codigo: payload.new.sscc,
-                        hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                    });
-                    renderizarTicker();
-                }).subscribe();
+        document.querySelector('header').addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+
+            clickCount++;
+            
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => { clickCount = 0; }, 400);
+            } else if (clickCount === 2) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                toggleFullscreen();
+            } else if (clickCount >= 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                reloadActiveApp();
+            }
+        });
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'notify') {
+                mostrarToast(event.data.message, event.data.status || 'success');
+            }
+        });
+
+        function mostrarToast(mensagem, tipo = 'success') {
+            const container = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast-animate pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-lg border shadow-xl text-xs font-medium backdrop-blur-md transition-all ${
+                tipo === 'success' 
+                    ? 'bg-slate-900/90 border-emerald-500/50 text-emerald-300' 
+                    : tipo === 'warning'
+                    ? 'bg-slate-900/90 border-amber-500/50 text-amber-300'
+                    : 'bg-slate-900/90 border-blue-500/50 text-blue-300'
+            }`;
+
+            const icone = tipo === 'success' ? 'check-circle' : tipo === 'warning' ? 'alert-triangle' : 'info';
+            
+            toast.innerHTML = `
+                <i data-lucide="${icone}" class="w-4 h-4 shrink-0"></i>
+                <span>${mensagem}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
     </script>
 </body>
