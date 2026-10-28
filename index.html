@@ -75,12 +75,16 @@
                 <i data-lucide="truck" class="w-3.5 h-3.5"></i>
                 <span>Carregamento</span>
             </button>
+            <button onclick="switchApp('caixas-misturadas', this)" id="btn-caixas-misturadas" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
+                <i data-lucide="box" class="w-3.5 h-3.5"></i>
+                <span>Caixas Misturadas</span>
+            </button>
             <button onclick="switchApp('sem-externas', this)" id="btn-sem-externas" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
                 <i data-lucide="tag" class="w-3.5 h-3.5"></i>
                 <span>Sem Externas</span>
             </button>
             <button onclick="switchApp('rastreio', this)" id="btn-rastreio" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
-                <i data-lucide="box" class="w-3.5 h-3.5"></i>
+                <i data-lucide="package" class="w-3.5 h-3.5"></i>
                 <span>Rastreio SSCC</span>
             </button>
             <button onclick="switchApp('etiquetas', this)" id="btn-etiquetas" class="nav-btn px-3 py-1.5 bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-medium rounded transition flex items-center space-x-1.5 shrink-0 border border-transparent hover:border-bordercol">
@@ -104,6 +108,7 @@
     <main class="flex-1 w-full relative bg-darkbg" id="mainContainer">
         <iframe id="frame-ocorrencias" src="https://ocportao1.vercel.app/" class="app-frame active" title="Ocorrências"></iframe>
         <iframe id="frame-carregamento" src="https://controle-carregamento.vercel.app/" class="app-frame" title="Carregamento"></iframe>
+        <iframe id="frame-caixas-misturadas" src="https://caixas-misturadas.vercel.app/" class="app-frame" title="Caixas Misturadas"></iframe>
         <iframe id="frame-sem-externas" src="https://fxcxgrnd3.netlify.app/" class="app-frame" title="Sem Externas"></iframe>
         <iframe id="frame-rastreio" src="https://repogrnd.netlify.app/" class="app-frame" title="Rastreio SSCC"></iframe>
         <iframe id="frame-etiquetas" src="https://controledeetiquetas.vercel.app/" class="app-frame" title="Etiquetas"></iframe>
